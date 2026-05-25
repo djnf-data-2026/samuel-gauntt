@@ -1,0 +1,84 @@
+---
+title: "DOD Spending - Samuel Gaunt"
+author: "Wells"
+date: "2026-05-25"
+output: html_document
+---
+
+# load libraries
+```{r}
+install.packages("tidycensus")
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+```
+
+#load DOD Spending data
+```{r}
+
+spending <- read_csv("../data/dod_spending_fy2020-24.csv") |> 
+     clean_names()
+
+```
+
+## Spending by Fiscal Year
+
+```{r}
+options(scipen = 999)  # Disable scientific notation globally
+
+spending |> 
+group_by(fyear) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(fyear)
+
+```
+
+## Spending by State
+
+```{r}
+spending |> 
+group_by(state_nm) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(desc(total_spent))
+
+```
+
+## Spending by city
+```{r}
+spending |> 
+group_by(cty_name, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(total_spent))
+
+```
+
+## Highlight specific city
+```{r}
+
+spending |> 
+  filter(cty_name == "HENNEPIN") |> 
+  group_by(agency) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(total_spent))
+```
+
+## Highlight specific state and city
+```{r}
+spending |> 
+  filter(state_nm == "ALABAMA") |> 
+  filter(cty_name == "COFFEE") |> 
+  select(fyear, cty_name, spending_total)
+```
+
