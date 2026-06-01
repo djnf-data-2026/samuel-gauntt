@@ -1,0 +1,1020 @@
+---
+title: "Scraping and Hidden APIs"
+author: "Aidan Hughes"
+date: "2026-05-30"
+output: html_document
+---
+
+Installing some of the libraries we'll need:
+
+```{r}
+# install.packages("tidyverse")
+# install.packages("lubridate")
+# install.packages("janitor")
+# install.packages("rvest")
+# install.packages("pdftools")
+```
+
+Loading some of the others:
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(rvest)
+library(pdftools)
+```
+
+Additional installations:
+
+A) If you have a Windows machine, install Node.js. Download and run the installer directly from nodejs.org — grab the LTS version.
+
+
+B) If you have a Mac, you'll first need to install Homebrew (click on Homebrew.pkg at the bottom of this page: https://github.com/Homebrew/brew/releases/tag/5.1.14). Then, go to the terminal and run "brew install node".
+
+After you've completed one of the above steps... the rplaywright library that we'll be using isn't on CRAN, so we'll need to install it slightly differently:
+
+```{r}
+install.packages("pak")
+pak::pak("erikaris/rplaywright") 
+rplaywright::install_rplaywright()  
+```
+
+Great! Now you're ready to roll.
+
+# Scraping and Obtaining Crappy Data
+
+Wouldn't it be nice if the data we wanted was always available online in a clean, downloadable format?
+
+Unfortunately, this is rarely the case. Data sets from government bodies and other websites are sometimes provided without much thought toward allowing others to easily obtain and analyze the data themselves.
+
+Other times, there's a need to automate the collection of online data on a repeatable, regular basis.
+
+When those problems arise, data journalists oftentimes turn to scraping and APIs to obtain data programmatically.
+
+In this session, we'll go over several methods for achieving those goals based on the complexity (aka crappiness) of the data source.
+
+We'll start with rvest, a simple tool for scraping relatively easy data from static web pages.
+
+After that, we'll practice using Playwright (using the R wrapper for the tool, rplaywright) to scrape crappier data from sources that would normally require a human to manually load or interact with the webpage.
+
+Then, we'll detour briefly to review how to extract data from PDFs using the pdftools library in R.
+
+Finally, we'll finish with a demonstration of how you can identify and make use of undocumented APIs that might feed data into webpages that simply can't be scraped otherwise.
+
+## A note on AI:
+
+LLMs and associated coding tools have advanced to the point that AI is now very effective at writing scrapers. All of the scraping I do these days is aided by and/or significantly sped up by the use of Claude Code or other AI tools.
+
+That being said, these tools aren't perfect—and neither are our initial attempts to tell AI what exactly we're trying to do. As a result, this lesson emphasizes becoming familiar with some basic concepts behind the tools and methods we're about to review. Once you have an understanding of those basics and what information you'll need to know/understand yourself, you'll be in a much stronger position to more effectively tell AI what you're trying to accomplish, guide it through those tasks, and troubleshoot with it when things get screwy.
+
+## Simple Scraping with rvest
+
+Load the rvest library: 
+```{r}
+library(rvest)
+```
+
+For this example, we’re going to work on loading a simple table of press releases from the Maryland State Courts. Let's store the url in the variable courts_url:
+
+```{r}
+courts_url <- "https://www.courts.state.md.us/media/news"
+```
+
+Now let's take a look at the page in our browser:
+
+https://www.courts.state.md.us/media/news
+
+If we could download the ideal data set from this information, what would the columns be? (There are three on my mind... or four if you can anticipate what we'd ultimately want to have in our data).
+
+In our web browser, if we right-click anywhere on the page and select “view source” from the popup menu, we can see the source code—the HTML that actually makes up the webpage we normally see.
+
+HTML does to my brain something akin to what Greek letters in a math equation do. As soon as I see it my brain short circuits a little bit. It's dense. There's a lot of *stuff* in there.
+
+But for our purposes, what we really want to pay attention to first are the different "tags" in this source code. They include things like:
+
+<thead> (aka table head)
+<tbody> (aka table body)
+<tr> (aka table row)
+
+Those tags are a starting point for us—and soon, our code—to identify the *stuff* in the HTML that represents the data we're trying to scrape.
+
+If we go back to the webpage, right-click, and select "Inspect", we can hover over specific parts of the source code and it'll highlight what parts of the webpage that specific section of the source code actually generates.
+
+Let’s write a bit of code to tell R to go to the URL for the page and ingest all of that HTML code. In the code below, we’re starting with our URL and using the read_html() function from rvest to ingest all of the page html, storing it as an object called results.
+
+```{r}
+# read in the html
+results <- courts_url |>
+  read_html()
+
+# display the html below
+results
+```
+
+In our environment window at right, you’ll see results as a “list of 2”.
+
+This is not a dataframe, it’s a different type of data structure a “nested list.”
+
+If we click on the name “results” in our environment window, we can see that it’s pulled in the html and shown us the general page structure. Nested within the <html> tag is the <head> and <body>, the two fundamental sections of most web pages. We’re going to pull information out of the <body> tag in a bit.
+
+Now, our task is to just pull out the section of the html that contains the information we need.
+
+But which part do we need from that mess of html code? To figure that out, we can go back to the page in a web browser like chrome, and use “inspect”.
+
+On the page, find the data we want to grab and right click on the word “Date” in the column header of the table. That will bring up a dropdown menu. Select “Inspect”, which will pop up a window called the “element inspector” that shows us where different elements on the page are located, what html tags created those elements, and other info.
+
+Note: another (probably less useful) method when dealing with easy-to-scrape data/info is to go back to "view page source" and ctrl+F for some of the text or numbers you're looking for.
+
+The table that we want is actually contained inside an html <table>. It has a <tbody> that contains one row <tr> per release.
+
+Because it’s inside of a table, and not some other kind of element (like a <div>), rvest has a special function for easily extracting and converting html tables, called html_table(). (We love it when developers use straightforward names.) This function extracts all the html tables on the page.
+
+```{r}
+# read in the html and extract all the tables
+results <- courts_url |>
+  read_html() |>
+  html_table()
+
+# show the dataframe
+
+results
+```
+
+In the environment window at right, look at results Note that it’s now a “list of 14”.
+
+This gets a little complicated, but what you’re seeing here is a nested list that contains one data frame – also called tibbles – one for each table that exists on the web page we scraped. There are tables for each year on the page, so we have 14 years’ worth of press releases.
+
+For now, let's just focus on the first table:
+
+```{r}
+# Just keep the first dataframe in our list
+
+results_2026 <- results[[1]]
+
+# show the dataframe
+
+results_2026
+
+```
+
+Awesome! 
+
+We now have a proper dataframe.
+
+From here, we can do a little cleaning. First we’ll use clean_names() to lower the column names. Then use rename() to replace the title column with a simpler version and properly format the date.
+
+```{r}
+results_2026_cleaned <- results_2026 |>
+  clean_names() |>
+  rename(title = news_release_news_item) |>
+  mutate(date = mdy(date))
+
+# show the dataframe
+results_2026_cleaned
+```
+
+And there we go. We now have a nice tidy dataframe of Maryland state court press releases. We could combine all of the tables from the webpage if we wanted to have the whole set.
+
+What about HTML that isn't stored neatly as a table? Or elements within the table that html_table() didn't extract? Well, that’s where things get a bit more complicated, and rely on your ability to read HTML and identify particular elements of it.
+
+For example, the table above contains only two columns: date and title.
+
+In our ideal data set, what else would it include? For starters, how about the url that each press release's title links to on the webpage?
+
+Let's go back to the "inspect" tool and figure out where that url is stored within the HTML.
+
+We can see that the urls are tied to the "href" attribute within <a> ("anchor") nodes.
+
+html_table() only extracted the table contents, and not the urls stored in the table's href attributes.
+
+We can use html_elements() after read_html() to extract both the contents and the links from that node.
+
+Extract the full table node:
+
+```{r}
+results <- courts_url |>
+  read_html()
+
+full_table_node_2026 <- html_elements(results, "table")[[1]]
+```
+
+extract the links:
+
+```{r}
+links_2026 <- full_table_node_2026 |>
+  html_elements("a") |>
+  html_attr("href") |>
+  url_absolute(courts_url)
+```
+
+add the links to our df:
+
+```{r}
+table_2026_w_urls <- results_2026 |>
+  mutate(url = links_2026)
+
+table_2026_w_urls
+```
+
+What's the last thing that we'd ideally want in our df?
+
+Now that we have the urls, let's extract the text of those pages.
+
+Let's click on one of those links and identify where we need to extract the text from:
+
+https://www.courts.state.md.us/media/news/2026/pr20260514 
+
+It looks like we'll need to extract and combine the text from all of the <p> nodes.
+
+```{r}
+press_release_url_example <- table_2026_w_urls$url[1]
+
+press_release_result <- read_html(press_release_url_example)
+
+press_release_text <- press_release_result |>
+  html_elements("p")
+
+press_release_text
+```
+This returns another nested list of <p> nodes. We'll use sapply to extract the actual text from those nodes:
+
+```{r}
+paragraphs <- sapply(press_release_text, html_text2)
+
+paragraphs
+```
+Now let's clean the paragraphs by getting rid of a) empty paragraphs, b) newlines, and c) paragraphs that start with "Contact Us" or "Copyright."
+
+```{r}
+paragraphs_clean <- paragraphs |>
+  str_replace_all("\n+", " ") |>
+  str_squish()
+
+paragraphs_clean <- paragraphs_clean[
+  paragraphs_clean != "" &
+    !str_detect(paragraphs_clean, regex("^Contact Us", ignore_case = TRUE)) &
+    !str_detect(paragraphs_clean, regex("^Copyright", ignore_case = TRUE))
+]
+
+paragraphs_clean
+```
+
+Finally, we'll collapse the list into a single string with paste():
+
+```{r}
+paragraphs_clean_combined <- paste(paragraphs_clean, collapse = " ")
+
+paragraphs_clean_combined
+```
+
+Great. Iterate through each of the press releases in our table, and apply the process we used above to add the full text for each one.
+
+Let's store the process/code we wrote above in a function:
+
+```{r}
+get_press_release_text <- function(url) {
+
+  page <- read_html(url)
+
+  press_release_text <- page |>
+    html_elements("p")
+
+  paragraphs <- sapply(
+    press_release_text,
+    html_text2
+  )
+
+  paragraphs <- paragraphs |>
+    str_replace_all("\n+", " ") |>
+    str_squish()
+
+  paragraphs <- paragraphs[
+    paragraphs != "" &
+    !str_detect(paragraphs, regex("^Contact Us", ignore_case = TRUE)) &
+    !str_detect(paragraphs, regex("^Copyright", ignore_case = TRUE))
+  ]
+
+  paste(paragraphs, collapse = " ")
+
+}
+```
+
+and apply the function to all of our rows using sapply:
+
+```{r}
+table_2026_complete <- table_2026_w_urls |>
+  mutate(
+    full_text = sapply(url, get_press_release_text)
+  )
+```
+
+Need to scrape something really specific? Running into issues because there are a lot of similar elements?
+
+Use "inspect," identify the node you want to scrape, then go up a few parent nodes. Right-click on the node and click "copy OuterHTML," and feed it into ChatGPT/Claude with a description of what you're trying to scrape within it.
+
+## Scraping with Playwright
+
+Load rplaywright:
+
+```{r}
+library(rplaywright)
+```
+
+
+Some websites suck. Maybe the data is paginated. Maybe it's dynamically loaded, and the url alone doesn't produce the data you need within the page's source code. Maybe you need type, search, or click things to access all the data you want.
+
+Back in the day, one of the only options we had to accomplish these tasks was something called Selenium. Here's the problem: Selenium sucked too. It was tough to use, often broke down, and led to more than one laptop being thrown out of a window (I assume.)
+
+Here's the great news: we now have a new tool called Playwright that's WAY simpler, more user friendly, and more reliable.
+
+![Selenium is dead. Long live Playwright.](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXlkYTh0ZW9idTNpdWJ2ZGkwbTloOTNra3cybDV3a2l6ejlwZWkxaCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1zRd5ZNo0s6kLPifL1/giphy.gif)
+
+I (and most people) typically work with Playwright in Python. However, some kind soul out there created an R wrapper for the tool, appropriately named rplaywright.
+
+Note: rplaywright is awesome. But the Python Playwright library is even simpler and even more intuitive in some ways. And I say that despite being much more comfortable in R than Python myself! For the sake of staying consistent with the rest of the stuff you're learning/doing this week, we're going to stick with R. But I'd encourage you to try out the Python library on your own later on.
+
+We installed everything we need for rplaywright at the top of our Rmd, so now let's load the package.
+
+```{r}
+library(rplaywright) 
+```
+
+Let's take a look at a website that you might need Playwright to acquire data from:
+
+https://www.usaspending.gov/recipient
+
+(In reality, USA Spending has an API that you could use instead of scraping. But if the API didn't exist, this is a simple example of a website we could scrape using Playwright without violating any Terms of Service... so just pretend there's no API for the purpose of this lesson.)
+
+When we open it up in a browser, it looks like a normal webpage.
+
+But let's look at what happens when we try extracting the html using rvest:
+
+```{r}
+page <- read_html("https://www.usaspending.gov/recipient")
+
+# inspect the full HTML that we just grabbed
+page |>
+  as.character() |>
+  cat()
+```
+
+Wait, where's all the data?
+
+Let's go back the the webpage, fire up the "inspect" tool, and see what happens when we load (refresh) the page.
+
+This is a good example of a website that loads its data dynamically, meaning the data tables we're looking at aren't housed within the HTML itself. In fact, when we initially load the page, the entire body is just:
+
+*<div id="app"></div>*
+
+So instead of relying on rvest, we'll use Playwright to simulate what a human would get to see when opening the page.
+
+First, we'll set up a new browser window:
+
+```{r}
+# launch a Chrome browser instance
+chrome <- new_chromium()
+
+# open a new browser profile (like a fresh incognito window)
+context <- chrome$new_context()$then()
+
+# open a new tab inside that profile (this is what actually launches the browser window)
+page <- context$new_page()$then()
+```
+
+$then() tells R to wait until Playwright/the browser has actually completed the action before executing the next line of code.
+
+Next, we'll tell browser to navigate to the webpage
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+
+page$goto("https://www.usaspending.gov/recipient")$then()
+```
+
+A "chromium" browser (which looks just like a Chrome window) pops up and navigates to our webpage. Go ahead and close out of the window.
+
+Sike! You might have noticed that chromium is still showing up in your taskbar even after you've closed the browser window. Selecting "Quit" may not be working either.
+
+
+First, let's get rid of what's currently running. If you're on a Mac, open up your Mac's terminal and force kill it with "pkill -f Chromium". If you're using Windows, open up the terminal and run "taskkill /F /IM chromium.exe".
+
+To prevent this from happening in the future, we'll need to tell Playwright to close chromium at the end of our process. Let's add 
+
+`chrome$close()$then()`
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+
+# close chromium
+chrome$close()$then()
+```
+
+That worked, but it all happened so fast that we hardly had time to tell if the page successfully loaded before the next action was run to close it. Let's slow things down while we build and test our scraper so we have time to actually observe what's happening and debug things if needed.
+
+In the python Playwright library, this is handled at the very top of your script by passing "slow_mo" when launching the browser:
+
+```
+browser = await p.chromium.launch(headless=False, slow_mo=1000) 
+
+# 1000 milliseconds (aka 1 second) between each action
+```
+
+Unfortunately, that option doesn't exist natively in rplaywright. Instead, we'll add Sys.sleep() between each of our actions.
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+
+# wait 2 seconds before moving on to the next step
+Sys.sleep(2)
+
+# close chromium
+chrome$close()$then()
+```
+
+
+
+Let's get back to business. Say we specifically want the data from the Grants tab. Let's use the "inspect" tool to find the element creating the tab itself. (Note: you'll want to right click on the tab AWAY from the text "Grant"—otherwise you're inspecting *only* the text and not the whole tab!)
+
+The full tab element is here:
+
+<div class="usa-dt-tab " role="tab" title="Show Grants" aria-label="Show Grants" tabindex="0"><div class="usa-dt-tab__content"><div class="usa-dt-tab__label"><div class="usa-dt-tab__label-text">Grants</div></div></div></div>
+
+The tab has class usa-dt-tab, and the tab has the text "Grants." So, to *locate* the tab that *has the text* "Grants", Playwright intuitively lets us write:
+
+*page$locator(".usa-dt-tab:has-text('Grants')")*
+
+Then, telling Playwright to click on the tab is literally as simple as adding $click.
+
+Nice, right?
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+
+Sys.sleep(2)
+
+# Click the Grants tab and wait for the click to register
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+
+Sys.sleep(2)
+
+# close chromium
+chrome$close()$then()
+```
+
+It worked!
+
+Note: the "." in front of usa-dt-tab means "find an element with this class." If we were targeting something other than a class, we'd use a different symbol. For example, #sch_button means find an element where id="sch_button". If you're targeting an HTML tag directly, you'd use no symbol. ChatGPT will be your friend when figuring out what syntax you'll need for the element you're targeting. (I don't have them memorized!)
+
+If it weren't for the 2 second sleeps we've built in for testing, our browser would be moving through those actions pretty fast. Sometimes it moves a little too fast though... in certain situations, the browser might even try to complete the next action before the necessary content has even loaded.
+
+Let's go back to the webpage in our own/normal browser and refresh the page.
+
+Use the "inspect" tool and select "Network".
+
+Now, while that's open, click on the "Grants" tab.
+
+See how the Network logged new activity? This website moves pretty fast, so we probably didn't see or notice that the page needed to pull data from another source when we click the tab. But if the data took longer to load, and we were planning on doing something with that new data next, Playwright might be already be trying to do the next action on stuff that just isn't there yet.
+
+We can prevent that problem by telling Playwright to wait until the network is idle before moving on to the next step.
+
+Depending on the webpage you're scraping, you might need to sprinkle it throughout multiple/many steps of your code. To start, we'll put it in two places: after we first load the webpage, and after we click the grants tab.
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+
+# Wait for the new content to finish loading
+page$wait_for_load_state("networkidle")$then()
+
+Sys.sleep(2)
+
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+
+# Wait for the new content to finish loading
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# close chromium
+chrome$close()$then()
+
+```
+
+Now that the source code contains HTML for the table we want to scrape, we can use $content to ingest all the HTML.
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+#ingest the HTML
+usaspending_html <- page$content()$then()
+
+# close chromium
+chrome$close()$then()
+
+```
+
+Take a quick look at it if you want to:
+
+```{r}
+usaspending_html
+```
+Now we can go back to our old friend rvest to parse the HTML we ingested and pull out our table:
+
+```{r}
+usaspending_table <- read_html(usaspending_html) |>
+  html_table() |>
+  _[[1]]
+```
+
+The column names need some fixing, but we got the data we wanted!
+
+But wait... we only have 50 rows, which means we only got the first page of data.
+
+If we wanted to get the full data set, we'd need to deal with pagination. The next page button comes from:
+
+`<button class="pager__button " type="button" title="Next page"><svg data-prefix="fas" data-icon="angle-right" class="svg-inline--fa fa-angle-right" role="img" viewBox="0 0 256 512" aria-hidden="true"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"></path></svg></button>`
+
+The easiest way to tackle this is to tell Playwright to locate and click the button where the class is "pager__button" and the title is "Next page".
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Click on the "Next page" button
+page$locator(".pager__button[title='Next page']")$click()$then()
+
+
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(5)
+# close chromium
+chrome$close()$then()
+
+```
+
+Whoops! Something went wrong... the next page button never got clicked. This is actually a real error I ran into when setting up this notebook. Thankfully, if we check the error message above, Playwright tells us exactly what went wrong: there are TWO next page buttons, one at the top of the data and one at the bottom. By default, if Playwright runs into more than one element that meets the criteria you gave it, it'll just throw its hands in the air and do nothing rather than guess which one you want it to interact with.
+
+We can fix this by adding $first() to explicitly target the first one:
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Click on the FIRST "Next page" button
+page$locator(".pager__button[title='Next page']")$first()$click()$then()
+
+
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+# close chromium
+chrome$close()$then()
+```
+
+That worked, but if we wanted to get all the data, we need a way to tell Playwright to just keep on pressing the next page button until it can't be pressed anymore.
+
+At that point, the HTML for the button becomes: 
+
+<button class="pager__button pager__button_disabled" type="button" title="Next page" disabled="">
+
+Each time we click the next page button, we're going to the Playwright to check whether the button on the new page has the "disabled" class. If it doesn't, it'll keep pressing the button. If it does, we're going to stop trying to hit the button.
+
+```{r}
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+
+
+# keep hitting the Next page button until it's disabled
+while (TRUE) {
+  btn_class <- page$locator(".pager__button[title='Next page']")$first()$get_attribute("class")$then()
+  if (grepl("pager__button_disabled", btn_class)) break
+  
+  page$locator(".pager__button[title='Next page']")$first()$click()$then()
+  page$wait_for_load_state("networkidle")$then()
+  Sys.sleep(2)
+}
+
+
+
+chrome$close()$then()
+```
+
+We're not going to wait for Playwright to work its way through 1200+ pages, so for the sake of our testing, let's have Playwright load the page, click next page a couple times, then click the last defined page number, and make sure it finally closes when the next page button is disabled.
+
+```{r}
+library(rvest)
+library(rplaywright)
+
+# Launch a new Chrome browser window
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+
+# Navigate to the USASpending recipient page and wait for it to fully load
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Click the Grants tab and wait for the grants data to load
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+all_tables <- list()
+
+# Extract page 1, then click next
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$locator(".pager__button[title='Next page']")$first()$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract page 2, then click next
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$locator(".pager__button[title='Next page']")$first()$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract page 3, then jump to the last page by clicking the second to last pagination button.
+# We use JavaScript here because rplaywright doesn't have a built-in way
+# to select elements by their position relative to other elements.
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$evaluate("() => {
+  const items = document.querySelectorAll('.pager .pager__item')
+  items[items.length - 2].querySelector('button').click()
+}")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract the last page
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+
+# Combine all extracted tables into a single data frame
+final_table <- do.call(rbind, all_tables)
+
+# Close the browser
+chrome$close()$then()
+```
+
+Note: this is one big spot where the python library would have made things simpler. To select an element based on its position relative to other elements (second to last), we had to use $evaluate and then run a small piece of JavaScript directly inside the browser. (Disclaimer: I don't know JS! Claude saved me on this one.)
+
+Python's Playwright has nth(), which lets you just select an element by its position:
+
+`await page.locator(".pager .pager__item").nth(-2).locator("button").click()`
+
+But let's get back to our R code. Now that the pagination is working, let's wrap up by re-incorporating extracting the html and pulling out the table from each page we load.
+
+Here's our full code. By now, it's a bit of a doozy. I've added comments throughout so we have each step explained along the way:
+
+```{r}
+library(rvest)
+library(rplaywright)
+
+# Launch a new Chrome browser window
+chrome <- new_chromium()           
+context <- chrome$new_context()$then()
+page <- context$new_page()$then()
+
+# Navigate to the USASpending recipient page and wait for it to fully load
+page$goto("https://www.usaspending.gov/recipient")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Click the Grants tab and wait for the grants data to load
+page$locator(".usa-dt-tab:has-text('Grants')")$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+all_tables <- list()
+
+# Extract the HTML from the current page: page$content()...
+# That HTML get passed into rvest's read_html(), which produces a list...
+# we then use rvest and the pipe operator to extract the first (and only) element within the list we created above, the data table, using |> html_table() |> _[[1]]))...
+# and append it to our all_tables list with append()
+# then click next to move to page 2
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$locator(".pager__button[title='Next page']")$first()$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract page 2, then click next
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$locator(".pager__button[title='Next page']")$first()$click()$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract page 3, then jump to the last page by clicking the second to last pagination button.
+# We use JavaScript here because rplaywright doesn't have a built-in way to select elements by their position relative to other elements.
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+page$evaluate("() => {
+  const items = document.querySelectorAll('.pager .pager__item')
+  items[items.length - 2].querySelector('button').click()
+}")$then()
+page$wait_for_load_state("networkidle")$then()
+Sys.sleep(2)
+
+# Extract the last page
+all_tables <- append(all_tables, list(read_html(page$content()$then()) |> html_table() |> _[[1]]))
+
+# Combine all extracted tables into a single data frame
+final_table <- do.call(rbind, all_tables)
+
+# Close the browser
+chrome$close()$then()
+
+```
+
+```{r}
+final_table
+```
+
+
+We did it! Now let's just clean up the column names.
+
+```{r}
+final_table_clean <- final_table |> rename(
+  "Recipient Name" = 1,
+  "UEI" = 2,
+  "Legacy DUNS" = 3,
+  "Awarded Amount" = 4
+)
+```
+
+```{r}
+final_table_clean
+```
+
+
+### Scraping PDFs
+
+Back in the day (like, this past semester), the textbook for UMD's main Data Journalism course taught students how to extract data from PDFs using a tool called Tabula.
+
+For years, Tabula was the go-to way to turn data tables from PDFs into data tables you can actually work with. It was revolutionary when it first came out. Finally, no more manual data entry!
+
+Sadly, Tabula's time in the modern data journalist's toolkit is coming to an end. Why? Well, a few reasons:
+
+1) Tabula is a manual process. That's a problem for a whole lot of reasons on its own. What if you have dozens, hundreds, thousands of PDFs to process (nightmarish)? What if you accidentally selected the wrong area and cut off some of the data (whoops)? What if you or someone else needs to check or reproduce your work (there's no code to check)? What if you need to set up a pipeline to extract data from PDFs on a recurring basis (you'd have to do it manually every time)?
+
+2) Tabula can really only extract structured data (and sometimes it's not even very good at doing that)
+
+3) LLM's are becoming very, very good at accurately extracting structured and unstructured data from PDFs
+
+Other instructors this week might cover processing PDFs with AI tools. (If they don't, reach out to me! We can walk through it together).
+
+Still, there are a few reasons why you might want to avoid using an LLM for this task. First, maybe you don't want to spend money (especially when it's your own money). Second, maybe you need really CONSISTENT output each time the same PDF is processed (even if it's not the BEST/cleanest output). Even the best LLM's will still produce sliiightly different outputs every once in a while when the process is run enough times.
+
+To solve that problem, we'll briefly touch on a PDF tool in R called... well, pdftools.
+
+```{r}
+library(pdftools)
+```
+
+
+First, let's use pdftools to extract the text from one page of the December 2025 issue of The R Journal. You'll find it in the pdfs folder, named r_journal_editorial.pdf
+
+We can use pdf_text() to extract text from the PDF:
+
+```{r}
+# Extract text from all pages (returns a character vector, one element per page)
+pages <- pdf_text("pdfs/r_journal_editorial.pdf")
+
+pages
+```
+
+View just the third page
+
+```{r}
+page_3 <- pages[3]
+
+page_3
+
+# make it easier to read
+cat(page_3)
+```
+
+
+Not perfect, but still pretty good!
+
+What about structured data? Let's look at a different PDF, named howard_county_voter_reg_report. We'll use pdf_data to extract the data from that report.
+
+```{r}
+page_data <- pdf_data("pdfs/howard_county_voter_reg_report.pdf")
+
+page_data
+```
+Woah, what is that? pdf_data actually produces tables where each word is a row with x/y coordinates, so you can reconstruct table columns by grouping on x or row bins by grouping on y. That spatial info is what makes pdf_data() useful for structured documents like government reports. Let's look at the first table:
+
+```{r}
+page_data[[1]]
+```
+
+```{r}
+# See all unique text on page 1, sorted top-to-bottom by y position
+page_data[[1]] |>
+  arrange(y, x) |>
+  select(x, y, text)
+```
+
+Next, we can reconstruct readable rows by grouping words that share the same y value and collapsing them in x order.
+
+```{r}
+page1_lines <- page_data[[1]] |>
+  arrange(y, x) |>
+  group_by(y) |>
+  summarise(line = paste(text, collapse = " "), .groups = "drop")
+
+page1_lines
+```
+
+Our data actually has multiple, separate tables. We'll use our y coordinates to filter the data for each table:
+
+ADDITIONS: y 99–269 (before "SUBTRACTIONS" header at y=287)
+
+SUBTRACTIONS: y 305–460
+
+CHANGES: y 524–552
+
+```{r}
+p1 <- page_data[[1]]
+
+additions <- p1 |> filter(y >= 99, y <= 269)
+subtractions <- p1 |> filter(y >= 305, y <= 460)
+changes <- p1 |> filter(y >= 524, y <= 552)
+```
+
+Now for the tedious part: defining the x-position ranges for each column and labeling them. Let's just do the additions table for now.
+
+```{r}
+additions_table <- additions |>
+  filter(y > 99) |>
+  mutate(column = cut(x,
+    breaks = c(0, 150, 215, 260, 308, 360, 500, 635, 665, 700, Inf),
+    labels = c("METHOD", "DEM", "REP", "GRN", "WCP", "UNA", "OTHERS", "TOTAL", "EXACT", "DUPES")
+  )) |>
+  arrange(y, x) |>
+  group_by(y, column) |>
+  summarise(value = paste(text, collapse = " "), .groups = "drop") |>
+  pivot_wider(names_from = column, values_from = value) |>
+  select(-y)
+
+additions_table
+```
+
+The problem with that method is that the break values are hardcoded to this specific PDF — if the layout shifts, you'd have to update them manually.
+
+Instead, we could use the method below. Not gonna lie, this gets kinda dense and it's more difficult to reason through the code (including for me). I'm going to provide the code here, but I don't want you to worry too much about it right now. This is mainly here just so you're aware that it exists and is, technically, an option.
+
+```{r}
+
+# Step 1: grab the header row and record each column name and its x position
+col_headers <- p1 |>
+  filter(y == 99) |>
+  arrange(x) |>
+  select(col_name = text, col_x = x)
+
+# Step 2: for any word, find which column header has the closest x position
+assign_col <- function(x_pos) {
+  col_headers$col_name[which.min(abs(col_headers$col_x - x_pos))]
+}
+
+additions_table <- additions |>
+  # Step 3: keep only data rows (everything below the header)
+  filter(y > 99) |>
+  # Step 4: run assign_col() on each row individually to label its column
+  rowwise() |>
+  mutate(column = assign_col(x)) |>
+  ungroup() |>
+  arrange(y, x) |>
+  # Step 5: collapse multi-word cells (e.g. "By" + "Mail" becomes "By Mail")
+  group_by(y, column) |>
+  summarise(value = paste(text, collapse = " "), .groups = "drop") |>
+  # Step 6: pivot so each column name becomes an actual column
+  pivot_wider(names_from = column, values_from = value) |>
+  select(-y)
+```
+
+
+Finally, one of the biggest liabilities—or best investigative tools—for a journalist: document metadata.
+
+If someone sends you a document and you need to protect the source, REMOVE THE METADATA! Redacting the document isn't enough!
+
+If someone sends you a document and you need to identify the source, CHECK THE METADATA! There might be key information there that someone forgot to scrub!
+
+Let's check the metadata of this sample PDF:
+
+```{r}
+sample_metadata <- pdf_info("pdfs/pdf_metadata_sample.pdf")
+
+sample_metadata
+```
+
+Now let's take a look at this redacted document, which had its metadata fully scrubbed (the "created" date here is when we uploaded the scrubbed document to DocumentCloud, not the actual creation date)
+
+```{r}
+redacted_metadata <- pdf_info("pdfs/doe-grant-termination-letter.pdf")
+
+redacted_metadata
+```
+
+## B-B-B-Bonus Round: Hidden/Undocumented APIs
+
+Sometimes a website just can't be scraped. Or maybe it can, in theory, but that theory sure seems to be escaping you.
+
+Many of you will already be familiar with the concept of APIs. If you're not, or even if you are, this Reddit comment on an ELI5 ("Explain Like I'm Five") post is still one of the best explanations I've seen.
+
+https://www.reddit.com/r/explainlikeimfive/comments/1kchsfw/comment/mq2qgm8/
+
+Sometimes APIs are public and publicized. Ideally, they're well-documented. Someone WANTS you to use the API, because they WANT you to access their data and/or or services, and they've given you a bunch of instructions about HOW to do that. Isn't that nice!
+
+In other cases, the owner of the data might not have taken such extensive steps to make their data so accessible. It might be public data, but they may not have had the time, resources, or knowledge to turn the systems driving the whole thing into something fit for widespread public use. In other situations, they may have gone to some lengths to discourage you from doing whatever it is you're trying to do.
+
+Here's the thing: in some situations, those systems are still driven by an API that we can identify and figure out how to make use of.
+
+Obvious disclaimer: don't do illegal shit. Don't do fraud. Don't do copyright infringement. Don't violate privacy regulations.
+
+Anyway, investigative data journalist Leon Yin wrote an article about finding undocumeted APIs for The Markup: https://themarkup.org/levelup/2023/03/03/journalists-you-should-be-looking-for-undocumented-apis-heres-how-to-start
+
+Versions of his tutorial (https://inspectelement.org/apis.html) pop up pretty much every year at NICAR.
+
+I used an undocumented API to scrape public records about medical and osteopathic physicians licensed in Pennsylvania. Let's take a look at the website:
+
+https://www.pals.pa.gov/#!/page/search
+
+Not even a Playwright script would've been a feasible solution here. Results are limited to 50 entries per search no matter what we do.
+
+Let's see if there's another way to access the data we're looking for.
+
+First, refresh the page.
+
+Use "inspect" and click the Network tab. At the top of the Network tab, you will see filter buttons. Click Fetch/XHR (Chrome) or XHR (Firefox). This hides all the image, CSS, and font requests and shows only the data requests.
+
+Now let's perform a new search. Select the fields we're looking for and hit the Search button. Watch the Network tab—you'll see new entries appear.
+
+Look for a request that:
+
+- Has a **POST** method (shown in the Method column)
+- Points to a URL that looks like an API endpoint (not an image or `.js` file)
+- Returns JSON data when you click it and look at the **Response** or **Preview** tab
+
+In this case, you will find a POST request to:
+
+```
+https://www.pals.pa.gov/api/Search/SearchForPersonOrFacilty
+```
+
+Note: you might notice the typo in "Facilty". This is the actual endpoint! It's a typo on their end, not ours.
+
+That URL structure — `/api/` followed by a descriptive path — is a strong signal that you have found an API endpoint.
+
+From there, ask for help from your friend ChatGPT. It'll get you up to speed on understanding and interacting with the API you've discovered much more easily/faster than trying to navigate through it manually.
+
+Depending on where we are with time right now, we can either do a live demo of what that process looked like for me, or wrap up. In either event, if you want to take a look at the final Python script that successfully extracted all the data I was looking for, it's in bonus/pa_medicine_compact_scraper.py
+
+## That's it.
+
+Questions? Comments? Hate mail? Wanna sign me up for annoying political fundraising emails?
+
+Aidan Hughes
+`athughes@umd.edu`
+or
+`aidthughes@gmail.com`

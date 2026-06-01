@@ -117,5 +117,52 @@ spending |>
   arrange(desc(fyear))
 
 ```
+```{r}
+#lets compare funding to red states vs blue states to see if there is a difference. first, i'm going to create a dataframe of total spending in each state. 
+
+states_spending <- spending |> 
+group_by(state_nm) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(desc(total_spent)) |>
+  mutate(state_nm = str_to_title(state_nm)) |>
+  rename(state = state_nm) 
+
+#lets load election results for the 2020 and 2024 elections. 
+
+voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
+
+states_spending_by_party <- left_join(states_spending, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) 
+
+states_spending_by_party |> group_by(results_2024) |>
+  summarize(
+    total_spending = sum(total_spent)
+  ) 
+
+
+#time to bring in some population data as well. yay, per capita rates! 
+
+library(tidycensus) 
+
+county_pop_2020 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2020
+) |>
+  select(GEOID, population = estimate) 
+
+spending <- spending |>
+  mutate(
+    GEOID = str_c(
+      str_pad(state_cd, width = 2, side = "left", pad = "0"),
+      str_pad(cty_cd, width = 3, side = "left", pad = "0")
+    )
+  ) 
+
+
+
+```
 
 
