@@ -5,8 +5,8 @@ date: "2026-05-25"
 output: html_document
 ---
 
-**YES IT WORKS**
 
+***Starter code***
 # load libraries
 ```{r}
 install.packages("tidycensus")
@@ -51,7 +51,7 @@ group_by(state_nm) |>
 
 ```
 
-## Spending by city
+## Spending by county
 ```{r}
 spending |> 
 group_by(cty_name, state_nm) |> 
@@ -63,7 +63,7 @@ group_by(cty_name, state_nm) |>
 
 ```
 
-## Highlight specific city
+## Highlight specific county
 ```{r}
 
 spending |> 
@@ -83,4 +83,39 @@ spending |>
   filter(cty_name == "COFFEE") |> 
   select(fyear, cty_name, spending_total)
 ```
+
+***My tests***
+```{r}
+
+#looking at top three states over time
+
+spending |> 
+  filter(state_nm == "TEXAS") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+spending |> 
+  filter(state_nm == "VIRGINIA") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+spending |> 
+  filter(state_nm == "CALIFORNIA") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+```
+
 
