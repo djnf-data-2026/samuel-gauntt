@@ -9,7 +9,7 @@ output: html_document
 ***Starter code***
 # load libraries
 ```{r}
-install.packages("tidycensus")
+#install.packages("tidycensus")
 library(tidyverse)
 library(tidycensus)
 library(janitor)
@@ -146,20 +146,90 @@ states_spending_by_party |> group_by(results_2024) |>
 
 library(tidycensus) 
 
+
+spending <- spending |>
+  mutate(
+    GEOID = str_pad(as.character(cty_cd), 5, pad = "0")
+  ) 
+
+head(spending %>% select(state_cd, cty_cd)) 
+
+
+spending_20 <- spending |>
+  filter(fyear==2020) 
+
+spending_21 <- spending |>
+  filter(fyear==2021) 
+
+spending_22 <- spending |>
+  filter(fyear==2022) 
+
+spending_23 <- spending |>
+  filter(fyear==2023) 
+
+spending_24 <- spending |>
+  filter(fyear==2024) 
+
 county_pop_2020 <- get_acs(
   geography = "county",
   variables = "B01003_001",  # total population
   year = 2020
 ) |>
+  select(GEOID, population = estimate)  
+
+county_pop_2021 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2021
+) |>
   select(GEOID, population = estimate) 
 
-spending <- spending |>
-  mutate(
-    GEOID = str_c(
-      str_pad(state_cd, width = 2, side = "left", pad = "0"),
-      str_pad(cty_cd, width = 3, side = "left", pad = "0")
-    )
-  ) 
+county_pop_2022 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2022
+) |>
+  select(GEOID, population = estimate) 
+
+county_pop_2023 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2023
+) |>
+  select(GEOID, population = estimate) 
+
+county_pop_2024 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2024
+) |>
+  select(GEOID, population = estimate) 
+
+spending_20 <- spending_20 |>
+  left_join(county_pop_2020, by = "GEOID") 
+
+spending_21 <- spending_21 |>
+  left_join(county_pop_2021, by = "GEOID") 
+
+spending_22 <- spending_22 |>
+  left_join(county_pop_2022, by = "GEOID") 
+
+spending_23 <- spending_23 |>
+  left_join(county_pop_2023, by = "GEOID") 
+
+spending_24 <- spending_24 |>
+  left_join(county_pop_2024, by = "GEOID") 
+
+bind_rows()
+
+spending_pop <- bind_rows(
+  spending_20,
+  spending_21,
+  spending_22,
+  spending_23,
+  spending_24
+) 
+
 
 
 
