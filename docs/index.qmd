@@ -5,6 +5,10 @@ format: html
 editor: visual
 ---
 
+Sam Gauntt
+
+sgauntt\@terpmail.umd.edu
+
 June 1, 2026\
 
 ## What is this story about?
@@ -58,10 +62,6 @@ Before I can finish my analysis, I still need to gain whatever data I can on the
 ## Estimated delivery
 
 I will have the bulk of my data analysis, research and visualization done this week. After that I need interviews to back up my research. I could turn this in by June 15, so I have time to track down lawmakers and advocates, as this is a busy time in Washington. 
-
--Sam Gauntt
-
-Contact: sgauntt\@terpmail.umd.edu
 
 ------------------------------------------------------------------------
 
