@@ -171,6 +171,8 @@ county_spending <- county_spending |>
   filter(z_score > 3) |>
   arrange(desc(z_score)) 
 
+county_spending
+
 ```
 
 ```{r}
@@ -357,23 +359,23 @@ state_spending <- state_spending |>
     state = str_to_title(state_nm)
   ) 
 
-state_spending_pop <- state_spending |>
+state_spending_capita <- state_spending |>
   left_join(
     state_pop,
     by = c("state", "fyear")
   )
 
-state_spending_pop <- state_spending_pop |>
+state_spending_capita <- state_spending_capita |>
   mutate(
     spending_per_capita = total_spent / population
   ) 
 
-state_spending_pop |>
+state_spending_capita |>
   filter(fyear == 2024) |>
   arrange(desc(spending_per_capita)) |>
   select(state, total_spent, population, spending_per_capita)
 
-state_spending_pop |>
+state_spending_capita |>
   left_join(voter_trends, by = "state") |>
   group_by(results_2024) |>
   summarize(
@@ -383,5 +385,6 @@ state_spending_pop |>
     .groups = "drop"
   ) 
 
+state_spending_capita |> write_csv("../data/state_spending_per_capita.csv")
 
 ```
