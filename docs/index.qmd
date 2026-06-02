@@ -25,7 +25,7 @@ With President Trump requesting \$1.5 trillion for the next federal military bud
 
 This story would ideally be interesting for a wide audience. Given that most states have a certain level of military presence and receive defense spending, seeing where spending is concentrated should be of interest for people across the country. I think people in states receiving less defense spending might actually be more interested, as they’re receiving less of a benefit even though its supported by their tax dollars. \
 
-## **For this story, I’d talk to:** 
+## For this story, I’d talk to: 
 
 - Rep. Adam Smith (D-WA), ranking member of the House Armed Services Committee and Rep. Mike Rogers (R-AL), chairman of the committee. 
 
@@ -49,7 +49,7 @@ Trump’s request of \$1.5 trillion in funding for the military would be a massi
 
 Most recent coverage has focused on the debate in Congress over Trump's requested budget. There have been many stories on Democrats and Congressional leadership pushing back against Trump's request, and what the increase would have for the military overall and its capabilities. Other coverage has compared defense spending in the U.S. compared to other nations, given that we spend more than the next several nations combined. Little coverage I've reviewed has focused on the difference between individual states or counties within the U.S.\
 
-## **Photos, video, graphics**
+## Photos, video, graphics
 
 - Photos: Pictures of military installations that will receive a boost in funding or the Pentagon. Also pictures of any lawmakers or sources I interview. 
 
@@ -61,13 +61,13 @@ Most recent coverage has focused on the debate in Congress over Trump's requeste
 
 Before I can finish my analysis, I still need to gain whatever data I can on the current budget request and see if there are any specific states or communities that will see a particularly small or large inrease/decrease. Additionally, I need to find if there is any data I can pull from 2025 or 2026. Currently, I only have data from 2020-2024, but ideally, I would like to include data from Trump’s second presidency as well. 
 
-## **Estimated delivery**
+## Estimated delivery
 
 I will have the bulk of my data analysis, research and visualization done this week. After that I need interviews to back up my research. I could turn this in by June 15, so I have time to track down lawmakers and advocates, as this is a busy time in Washington. 
 
 ------------------------------------------------------------------------
 
-## CODE
+## **CODE**
 
 load libraries
 
@@ -387,4 +387,3 @@ state_spending_pop |>
 
 
 ```
-
