@@ -1,174 +1,390 @@
 ---
-title: "Hosting a GitHub Page"
-author: "Rob Wells"
-date: "5-29-2026"
-format:
-  html:
-    theme: cosmo
+title: "Memo first draft"
+author: "Sam Gauntt"
+format: html
+editor: visual
 ---
 
-# Hosting a GitHub Page - R Cheat Sheet
+# **Data Analysis Project Memo**
 
-This exercise will allow you to create a basic web page which will be required for the Investigate Your Community final project option.
+Sam Gauntt
 
-For this exercise, you will create a page with your one paragraph story idea. You will then host it on your GitHub page.
+sgauntt\@terpmail.umd.edu
 
-## Styled Text
+June 1, 2026\
 
-At the core, QMD files are text files, and they allow you to use a very lightweight "markup" language to style text, similar to html, but much less fussy.
+## What is this story about?
 
-Outside of the codeblocks (the gray sections where we write code), we can style any text using standard markdown styling.
+The federal government sends hundreds of billions in defense spending to states across the U.S. each year. Who benefits the most? This story will look into where DOD spending is concentrated, and how population, political ideology and other traits relate to this spread.
 
-This is a nice guide to styling text with markdown: [Markdown guide](https://quarto.org/docs/authoring/markdown-basics.html)
+## Why tell this story NOW?
 
-We can create headings similar to html's h1 to h6 with hashtags.
+With President Trump requesting \$1.5 trillion for the next federal military budget, an increase of 44%, now is a better time than ever to dig into where the federal government concentrates its military spending. 
 
-##### This is an h5
+## Who is your target audience?
 
-We can create links, like this: [google](https://google.com)
+This story would ideally be interesting for a wide audience. Given that most states have a certain level of military presence and receive defense spending, seeing where spending is concentrated should be of interest for people across the country. I think people in states receiving less defense spending might actually be more interested, as they’re receiving less of a benefit even though its supported by their tax dollars. \
 
-We can **bold** or *italic* text.
+## **For this story, I’d talk to:** 
 
-We can create bulleted lists.
+- Rep. Adam Smith (D-WA), ranking member of the House Armed Services Committee and Rep. Mike Rogers (R-AL), chairman of the committee. 
 
-- bullet one
-- bullet two
-- bullet three
+- Steve Ellis, president of Taxpayers for Commons Sense. He has been sounding the alarm on the impact of such a significant funding increase for the Department of Defense. 
 
-## Code blocks
+- Kristy E. Williams, Director of Defense Capabilities and Management for the U.S. Government Accountability Office. She recently oversaw a report into the Pentagon that determined the its leadership did not consider the impact of recent civilian federal worker layoffs on its operations. 
 
-We can also add special code inside of code blocks -- the gray sections where we write code -- that control how they render in our html document. These output options let us do things like:
+## Impact
 
-- Show or hide the code when we render our html document (echo: true or false)
-- Prevent the code from actually running when we render our html document (eval: true or false)
-- Hide warnings from outputing when we render our html document (warning: true or false)
+Trump’s request of \$1.5 trillion in funding for the military would be a massive surge over any previous budget. It also coincides with slashes in federal support for many other agencies and departments, rising costs, increasing inflation and layoffs of federal workers. The money for this budget increase would have to come from other sources, such as cuts for other services. And this could impact daily lives of U.S. citizens.
 
-There's a [full guide here](https://quarto.org/docs/computations/execution-options.html#output-options).
+## Three interesting takeaways
 
-The code below, for example, will output the text inside the print statement when rendered to html, but the actual code -- the print() function -- will be hidden.
+1.  Fort Worth, Texas, receives by far the most defense spending of any community in the country at about \$120 billion from 2020 to 2024. T
 
-## Create your website
+2.  Virginia received the most spending per resident, at about \$5,800 per Virginia resident.
 
-In place of these instructions, you will paste your project one paragraph story idea into this document and any code you've developed so far.
+3.  2024 was the first year since 2020 that defense spending decreased over the previous year.\
 
-You will need to load libraries and data because rendering a page requires a full R session to execute on the code.
+## Summarize any previous coverage
 
-First, create H1 headers
+Most recent coverage has focused on the debate in Congress over Trump's requested budget. There have been many stories on Democrats and Congressional leadership pushing back against Trump's request, and what the increase would have for the military overall and its capabilities. Other coverage has compared defense spending in the U.S. compared to other nations, given that we spend more than the next several nations combined. Little coverage I've reviewed has focused on the difference between individual states or counties within the U.S.\
 
-**For example:**
+## **Photos, video, graphics**
 
-# Income and Vacancies of Baltimore Neighborhoods 2020
+- Photos: Pictures of military installations that will receive a boost in funding or the Pentagon. Also pictures of any lawmakers or sources I interview. 
 
-## Looking at wealth inequality in Charm City
+- Video: I could perhaps do a vertical video explaining this story. A lot of people on social media are concerned about military spending, so a quick explainer ahead of the budget reconciliation process could be useful.  
 
-```{r eval=FALSE, include=TRUE}
+- Graphics: I am going to make a heat map of U.S. counties by total defense spending. I can also make a chart showing spending based on whether states voted for Trump or Harris in 2024, with circles for each state colored depending on how it voted and sized in accordance with its defense funding. This can give viewers a sense if there are any party trends in funding.
 
-# You will write your code in chunks but not execute the data. Use {r eval=FALSE, include=TRUE} in the header so the page will render without running the actual code.
-income_vacancy %>% 
-  ggplot(aes(x = community)) +
-  geom_point(aes(y=income_2020), color = "#64D197", stroke=5) +
-  geom_point(aes(y=vacant_2020*1000), stroke=5, color = "#FB8AE3") +
-  scale_y_continuous(
-    name = "2020 Income (Green)", limits=c(0, 62000), labels=scales::dollar_format(),
-    sec.axis = sec_axis(~./60000, name="2020 Percent Vacancies (Red)", labels = scales::percent))+
-  #scale_y_continuous(labels = scales::percent) +
-  labs(
-    title = "Income and Vacancies of Baltimore Neighborhoods 2020",
-    x = "Community",
-    caption = "source: BNIA Data - By: Parker Leipzig and Rob Wells"
+## Next steps
+
+Before I can finish my analysis, I still need to gain whatever data I can on the current budget request and see if there are any specific states or communities that will see a particularly small or large inrease/decrease. Additionally, I need to find if there is any data I can pull from 2025 or 2026. Currently, I only have data from 2020-2024, but ideally, I would like to include data from Trump’s second presidency as well. 
+
+## **Estimated delivery**
+
+I will have the bulk of my data analysis, research and visualization done this week. After that I need interviews to back up my research. I could turn this in by June 15, so I have time to track down lawmakers and advocates, as this is a busy time in Washington. 
+
+------------------------------------------------------------------------
+
+## CODE
+
+load libraries
+
+```{r}
+#install.packages("tidycensus")
+library(tidyverse)
+library(tidycensus)
+library(janitor)
+```
+
+Load DOD spending data
+
+```{r}
+
+spending <- read_csv("../data/dod_spending_fy2020-24.csv") |> 
+     clean_names()
+
+```
+
+Spending by fiscal year
+
+```{r}
+options(scipen = 999)  # Disable scientific notation globally
+
+spending |> 
+group_by(fyear) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(fyear)
+
+```
+
+Spending by state
+
+```{r}
+spending |> 
+group_by(state_nm) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(desc(total_spent))
+
+```
+
+## Spending by county
+
+```{r}
+spending |> 
+group_by(cty_name, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(total_spent))
+
+```
+
+## Highlight specific county
+
+```{r}
+
+spending |> 
+  filter(cty_name == "HENNEPIN") |> 
+  group_by(agency) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(total_spent))
+```
+
+## Highlight specific state and city
+
+```{r}
+spending |> 
+  filter(state_nm == "ALABAMA") |> 
+  filter(cty_name == "COFFEE") |> 
+  select(fyear, cty_name, spending_total)
+```
+
+***My tests***
+
+```{r}
+#lets find outliers among counties in terms of funding
+
+county_spending <- spending |> 
+group_by(cty_name, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(total_spent)) 
+
+
+county_spending <- county_spending |>
+  mutate(
+    z_score = (total_spent - mean(total_spent)) /
+      sd(total_spent)
+  ) |>
+  filter(z_score > 3) |>
+  arrange(desc(z_score)) 
+
+```
+
+```{r}
+
+#looking at top three states over time
+
+spending |> 
+  filter(state_nm == "TEXAS") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+spending |> 
+  filter(state_nm == "VIRGINIA") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+spending |> 
+  filter(state_nm == "CALIFORNIA") |> 
+  group_by(fyear, state_nm) |> 
+  summarize(
+     total_spent = sum(spending_total, na.rm = TRUE),
+     n = n()
+  ) |> 
+  arrange(desc(fyear))
+
+```
+
+```{r}
+#lets compare funding to red states vs blue states to see if there is a difference. first, i'm going to create a dataframe of total spending in each state. 
+
+states_spending <- spending |> 
+group_by(state_nm) |> 
+  summarize(
+    n = n(),
+    total_spent = sum(spending_total, na.rm = TRUE)
+  ) |> 
+  arrange(desc(total_spent)) |>
+  mutate(state_nm = str_to_title(state_nm)) |>
+  rename(state = state_nm) 
+
+#lets load election results for the 2020 and 2024 elections. 
+
+voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
+
+states_spending_by_party <- left_join(states_spending, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) 
+
+states_spending_by_party |> group_by(results_2024) |>
+  summarize(
+    total_spending = sum(total_spent)
+  ) 
+
+
+#time to bring in some population data as well. yay, per capita rates! 
+
+library(tidycensus) 
+
+
+spending <- spending |>
+  mutate(
+    GEOID = str_pad(as.character(cty_cd), 5, pad = "0")
+  ) 
+
+head(spending %>% select(state_cd, cty_cd)) 
+
+
+spending_20 <- spending |>
+  filter(fyear==2020) 
+
+spending_21 <- spending |>
+  filter(fyear==2021) 
+
+spending_22 <- spending |>
+  filter(fyear==2022) 
+
+spending_23 <- spending |>
+  filter(fyear==2023) 
+
+spending_24 <- spending |>
+  filter(fyear==2024) 
+
+county_pop_2020 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2020
+) |>
+  select(GEOID, population = estimate)  
+
+county_pop_2021 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2021
+) |>
+  select(GEOID, population = estimate) 
+
+county_pop_2022 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2022
+) |>
+  select(GEOID, population = estimate) 
+
+county_pop_2023 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2023
+) |>
+  select(GEOID, population = estimate) 
+
+county_pop_2024 <- get_acs(
+  geography = "county",
+  variables = "B01003_001",  # total population
+  year = 2024
+) |>
+  select(GEOID, population = estimate) 
+
+spending_20 <- spending_20 |>
+  left_join(county_pop_2020, by = "GEOID") 
+
+spending_21 <- spending_21 |>
+  left_join(county_pop_2021, by = "GEOID") 
+
+spending_22 <- spending_22 |>
+  left_join(county_pop_2022, by = "GEOID") 
+
+spending_23 <- spending_23 |>
+  left_join(county_pop_2023, by = "GEOID") 
+
+spending_24 <- spending_24 |>
+  left_join(county_pop_2024, by = "GEOID") 
+
+bind_rows()
+
+spending_pop <- bind_rows(
+  spending_20,
+  spending_21,
+  spending_22,
+  spending_23,
+  spending_24
+) 
+
+
+
+```
+
+```{r}
+#lets look at state spending again, now with population. 
+
+state_spending <- spending |>
+  group_by(fyear, state_nm) |>
+  summarize(
+    total_spent = sum(spending_total, na.rm = TRUE),
+    .groups = "drop"
+  ) 
+
+#get census info
+
+years <- 2020:2024
+
+state_pop <- map_dfr(years, function(y) {
+  get_acs(
+    geography = "state",
+    variables = "B01003_001",
+    year = y
+  ) %>%
+    transmute(
+      fyear = y,
+      state = NAME,
+      population = estimate
+    )
+})
+
+#lets group by state, and find the total spending per resident. 
+
+state_spending <- state_spending |>
+  mutate(
+    state = str_to_title(state_nm)
+  ) 
+
+state_spending_pop <- state_spending |>
+  left_join(
+    state_pop,
+    by = c("state", "fyear")
   )
-```
 
-## Set up for hosting
+state_spending_pop <- state_spending_pop |>
+  mutate(
+    spending_per_capita = total_spent / population
+  ) 
 
-- Create a new folder in your repository called "docs" (if one isn't there already)
-- Rename this document as "index.qmd"
-- Move "index.qmd" into the "docs" folder
+state_spending_pop |>
+  filter(fyear == 2024) |>
+  arrange(desc(spending_per_capita)) |>
+  select(state, total_spent, population, spending_per_capita)
 
-## Render this document as an html page
+state_spending_pop |>
+  left_join(voter_trends, by = "state") |>
+  group_by(results_2024) |>
+  summarize(
+    total_spending = sum(total_spent),
+    total_population = sum(population),
+    spending_per_capita = total_spending/total_population,
+    .groups = "drop"
+  ) 
 
-- Make sure this document is named "index.qmd" and is in the "docs" folder
-- Click Render button. It will create an html version of this page, called "index.html"
-- Use GitHub Desktop to push your files to your your github repository on the web.
-- Access the URL from your Github repository.
-
-## Host html on GitHub
-
-- Go to your github repository on the web, such as https://github.com/djnf-data-2026/casey-mann
-- Click on Settings on the top right.
-- Scroll down to the Pages section of Settings.
-- Change the Branch to /docs and click save.
-
-#### To see your file hosted:
-
-- Back to your GitHub repo on the web: such as https://github.com/djnf-data-2026/casey-mann
-- Click on Settings, then Pages
-- Under GitHub Pages, you should see "Your site is live at https://djnf-data-2026.github.io/casey-mann/"
-- Click that URL
-- If it works, email it to robwells\@umd.edu
-
-## REVEL IN YOUR NERD POWERS
-
-# Part 2: Embedding Images
-
-- create a folder in your repository's main branch, call it images
-
-- find any .jpeg, .jpg or .png file and insert it into that folder.
-
-- In a QMD file, display the image as follows:
-
-\#![CAPTION FOR YOUR PHOTO](images/your_link_here.png)
-
-\#![CHATTER FOR YOUR chart](images/xl-refresher-grid_SHEETS.png)
-
-A more advanced technique controlling the width and height
-
-\#![Read the Screen](images/xl-refresher-SHEETS_screen.png){width="100%"}
-
-### Embedding code
-
-From a **Datawrapper Map**
-
-<iframe title="Small Business Reporting, Spring 2024" aria-label="Map" id="datawrapper-chart-z4bny" src="https://datawrapper.dwcdn.net/z4bny/5/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="500" data-external="1">
-
-</iframe>
-
-```{=html}
-<script type="text/javascript">!function(){"use strict";window.addEventListener("message",(function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r=0;r<e.length;r++)if(e[r].contentWindow===a.source){var i=a.data["datawrapper-height"][t]+"px";e[r].style.height=i}}}))}();
-</script>
-```
-
-## Embedding video
-
-### Deep Nerd Video
-
-::: {#first_steps}
-<iframe width="560" height="315" src="https://www.youtube.com/embed/TNP_unReOpw?si=CQC3cG49TShkoJOG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-
-</iframe>
-:::
-
-::: {#second_steps}
-### A great lecture on structural racism in journalism
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/DIDHbEZYFSc?si=a-KNzlQgoGjXD6VV" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-
-</iframe>
-:::
-
-**Now replace these two videos with something you selected.**
-
-The embed code is in the video share feature
-
-## Instructions to embed a gif
-
-```{r text_to_columns.gif, out.width="100%", echo=FALSE}
-### Embed a GIF
-#First, download a GIF (extension will be .gif) and load it into "images" folder
-#if (knitr::is_html_output()) knitr::include_graphics("images/text_to_columns.gif")  
 
 ```
 
-This is a very basic starter but it will get you to the finish line on Saturday. Good luck!
-
---30--
