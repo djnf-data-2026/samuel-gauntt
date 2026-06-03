@@ -5,13 +5,15 @@ format: html
 editor: visual
 ---
 
-![Photo via Flickr](images/48844139503_7fd165c96f_o.jpg)
+# The U.S. government spends hundreds of billions each year on defense. Where does it go?
 
-Sam Gauntt
+![Photo via Flickr](../images/48844139503_7fd165c96f_o.jpg)
+
+By Sam Gauntt
 
 sgauntt\@terpmail.umd.edu
 
-June 1, 2026\
+June , 2026\
 
 ## What is this story about?
 
