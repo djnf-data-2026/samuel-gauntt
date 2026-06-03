@@ -23,6 +23,18 @@ The federal government sends hundreds of billions in defense spending to states 
 
 With President Trump requesting \$1.5 trillion for the next federal military budget, an increase of 44%, now is a better time than ever to dig into where the federal government concentrates its military spending. 
 
+## Three interesting takeaways
+
+1.  Fort Worth, Texas, receives by far the most defense spending of any community in the country at about \$120 billion from 2020 to 2024.
+
+2.  Virginia received the most spending per resident, at about \$5,800 per Virginia resident.
+
+3.  2024 was the first year since 2020 that defense spending decreased over the previous year.\
+
+<iframe title="Virginia received an average of $5833 in federal defense spending per resident in 2024" aria-label="Choropleth map" id="datawrapper-chart-tUA6y" src="https://datawrapper.dwcdn.net/tUA6y/14/" scrolling="no" frameborder="0" style="border: none;" width height data-external="1">
+
+</iframe>
+
 ## Who is your target audience?
 
 This story would ideally be interesting for a wide audience. Given that most states have a certain level of military presence and receive defense spending, seeing where spending is concentrated should be of interest for people across the country. I think people in states receiving less defense spending might actually be more interested, as they’re receiving less of a benefit even though its supported by their tax dollars. \
@@ -38,14 +50,6 @@ This story would ideally be interesting for a wide audience. Given that most sta
 ## Impact
 
 Trump’s request of \$1.5 trillion in funding for the military would be a massive surge over any previous budget. It also coincides with slashes in federal support for many other agencies and departments, rising costs, increasing inflation and layoffs of federal workers. The money for this budget increase would have to come from other sources, such as cuts for other services. And this could impact daily lives of U.S. citizens.
-
-## Three interesting takeaways
-
-1.  Fort Worth, Texas, receives by far the most defense spending of any community in the country at about \$120 billion from 2020 to 2024. T
-
-2.  Virginia received the most spending per resident, at about \$5,800 per Virginia resident.
-
-3.  2024 was the first year since 2020 that defense spending decreased over the previous year.\
 
 ## Summarize any previous coverage
 
@@ -74,7 +78,6 @@ I will have the bulk of my data analysis, research and visualization done this w
 load libraries
 
 ```{r}
-#install.packages("tidycensus")
 library(tidyverse)
 library(tidycensus)
 library(janitor)
@@ -86,6 +89,8 @@ Load DOD spending data
 
 spending <- read_csv("../data/dod_spending_fy2020-24.csv") |> 
      clean_names()
+
+glimpse(spending) 
 
 ```
 
