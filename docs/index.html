@@ -177,20 +177,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2,754 × 4
+<pre><code># A tibble: 2,754 × 3
 # Groups:   cty_name [1,698]
-   cty_name    state_nm       total_spent     n
-   &lt;chr&gt;       &lt;chr&gt;                &lt;dbl&gt; &lt;int&gt;
- 1 TARRANT     TEXAS         121527757824     5
- 2 &lt;NA&gt;        &lt;NA&gt;          120397512704     5
- 3 FAIRFAX     VIRGINIA       83552362496     5
- 4 SAN DIEGO   CALIFORNIA     55411527680     5
- 5 NEW LONDON  CONNECTICUT    50510425575    10
- 6 DALLAS      TEXAS          48848848896     5
- 7 LOS ANGELES CALIFORNIA     46751993344     5
- 8 SAINT LOUIS MISSOURI       45924375552     5
- 9 MIDDLESEX   MASSACHUSETTS  45255071232     5
-10 PIMA        ARIZONA        45238097408     5
+   cty_name    state_nm      `total_spent_$`
+   &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;          
+ 1 TARRANT     TEXAS         $121.53B       
+ 2 &lt;NA&gt;        &lt;NA&gt;          $120.40B       
+ 3 FAIRFAX     VIRGINIA      $83.55B        
+ 4 SAN DIEGO   CALIFORNIA    $55.41B        
+ 5 NEW LONDON  CONNECTICUT   $50.51B        
+ 6 DALLAS      TEXAS         $48.85B        
+ 7 LOS ANGELES CALIFORNIA    $46.75B        
+ 8 SAINT LOUIS MISSOURI      $45.92B        
+ 9 MIDDLESEX   MASSACHUSETTS $45.26B        
+10 PIMA        ARIZONA       $45.24B        
 # ℹ 2,744 more rows</code></pre>
 </div>
 </div>
@@ -199,18 +199,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 3
-  results_2020 total_spending `total_spent_$`
-  &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;          
-1 Democratic     234323615136 $234.32B       
-2 Republican     166332428212 $166.33B       </code></pre>
+<pre><code># A tibble: 2 × 2
+  results_2020 `total_spent_$`
+  &lt;chr&gt;        &lt;chr&gt;          
+1 Democratic   $234.32B       
+2 Republican   $166.33B       </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 3
-  results_2024 total_spending `total_spending_$`
-  &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;             
-1 Democratic     205889339561 $205.89B          
-2 Republican     207986846998 $207.99B          </code></pre>
+<pre><code># A tibble: 2 × 2
+  results_2024 `total_spent_$`
+  &lt;chr&gt;        &lt;chr&gt;          
+1 Democratic   $205.89B       
+2 Republican   $207.99B       </code></pre>
 </div>
 </div>
 </section>

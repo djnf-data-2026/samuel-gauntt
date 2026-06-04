@@ -93,7 +93,9 @@ group_by(cty_name, state_nm) |>
      total_spent = sum(spending_total, na.rm = TRUE),
      n = n()
   ) |> 
-  arrange(desc(total_spent))
+  arrange(desc(total_spent)) |>
+  mutate('total_spent_$' = scales::dollar(total_spent / 1e9, suffix = "B", accuracy = 0.01)) |>
+  select(cty_name, state_nm, 'total_spent_$')
 
 
 spending_cty
@@ -133,13 +135,13 @@ states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = 
   summarize(
     total_spending = sum(total_spent)
   ) |>
-  mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01))
+  mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2020, 'total_spent_$')
 
 states_spending_by_party_24 <- left_join(states_spending_24, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2024) |>
   summarize(
     total_spending = sum(total_spent)
   ) |>
-  mutate('total_spending_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01))
+  mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2024, 'total_spent_$')
 
 states_spending_by_party_20
 
