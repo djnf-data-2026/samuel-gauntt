@@ -7,7 +7,7 @@ editor: visual
 
 # The U.S. government spends hundreds of billions each year on defense. Where does it go?
 
-![Photo via Flickr](../images/48844139503_7fd165c96f_o.jpg)
+![Photo via Flickr](https://raw.githubusercontent.com/djnf-data-2026/samuel-gauntt/main/images/48844139503_7fd165c96f_o.jpg) 
 
 By Sam Gauntt
 
