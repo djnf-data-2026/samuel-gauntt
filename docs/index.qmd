@@ -1,19 +1,22 @@
 ---
-title: "Memo second draft"
-author: "Sam Gauntt"
-format: html
+title: "The U.S. government spends hundreds of billions each year on defense. Where does it go?"
+format: 
+  html: 
+    toc: true
+    toc-depth: 2
+    math: katex
 editor: visual
+execute: 
+  warning: false # suppress warnings
+date: last-modified
+date-format: "YYYY-MM-DD HH:mm"
+author: 
+  - name: Sam Gauntt
+    email: sgauntt@terpmail.umd.edu
+    url: https://www.linkedin.com/in/sam-gauntt-203716247/
 ---
 
-# The U.S. government spends hundreds of billions each year on defense. Where does it go?
-
 ![Photo via Flickr](https://raw.githubusercontent.com/djnf-data-2026/samuel-gauntt/main/images/48844139503_7fd165c96f_o.jpg)
-
-By Sam Gauntt
-
-sgauntt\@terpmail.umd.edu
-
-June 3, 2026
 
 ## What is this story about?
 
@@ -25,15 +28,19 @@ With President Trump requesting \$1.5 trillion for the next federal military bud
 
 ## Key takeaways
 
-1.  Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024, but switched positions.
+**Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024. But they switched positions.**
 
 ```{r}
-#| echo: false
 #| message: false
 #| warning: false
+#| code-fold: true
+#| code-summary: "Code"
+
 library(tidyverse)
 library(tidycensus)
 library(janitor)
+library(DT) 
+library(dplyr) 
 
 spending <- read_csv("../data/dod_spending_fy2020-24.csv") |> 
      clean_names()
@@ -49,8 +56,13 @@ top_spenders_20 <- spending |>
   mutate(
     total_spent_billions = total_spent / 1e9,
     total_spending_20 = scales::dollar(total_spent_billions, suffix = "B")
-  ) |> select(state_nm, total_spending_20)
-
+  ) |> mutate(
+    state_nm = replace_na(state_nm, "NO STATE LISTED")
+  ) |>
+  select(state_nm, total_spending_20) |> rename(
+     State = state_nm,
+     `Total Received` = total_spending_20
+   ) 
 
 top_spenders_24 <- spending |>
   filter(fyear == 2024) |>
@@ -63,15 +75,36 @@ top_spenders_24 <- spending |>
   mutate(
     total_spent_billions = total_spent / 1e9,
     total_spending_24 = scales::dollar(total_spent_billions, suffix = "B")
-  ) |> select(state_nm, total_spending_24)
+  ) |>  mutate(
+    state_nm = replace_na(state_nm, "NO STATE LISTED")
+  ) |>select(state_nm, total_spending_24) |> rename(
+     State = state_nm,
+     `Total Received` = total_spending_24
+   ) 
 
-top_spenders_20
+datatable(
+  top_spenders_20,
+  options = list(
+    pageLength = 10,
+    dom = "t"
+  ),
+  caption = "Top 10 states by defense spending in FY2020"
+) 
 
-top_spenders_24
+
+datatable(
+  top_spenders_24,
+  options = list(
+    pageLength = 10,
+    dom = "t"
+  ),
+  caption = "Top 10 states by defense spending in FY2024"
+) 
+
 
 ```
 
-2.  Virginia received the most spending per resident in 2024, at about \$5,800 per capita. In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident.
+**Virginia received the most spending per resident in 2024, at about \$5,800 per capita. In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident.**
 
 <iframe title="Connecticut received $6325 in federal defense spending per resident in 2020, most of any state" aria-label="Choropleth map" id="datawrapper-chart-0Sn0K" src="https://datawrapper.dwcdn.net/0Sn0K/10/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height data-external="1">
 
@@ -81,72 +114,81 @@ top_spenders_24
 <script type="text/javascript">(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();</script>
 ```
 
-3.  Over the four years the data tracks from 2020 to 2024, Fort Worth, Texas, received by far the most defense spending of any community in the country at about \$120 billion.
+**Over the four years the data tracks from 2020 to 2024, Fort Worth, Texas, received by far the most defense spending of any community in the country at about \$120 billion.**
 
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-spending_cty <- spending |> 
-group_by(cty_name, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(total_spent)) |>
-  mutate('total_spent_$' = scales::dollar(total_spent / 1e9, suffix = "B", accuracy = 0.01)) |>
-  select(cty_name, state_nm, 'total_spent_$')
+- ::: {}
+  ```{r}
+  #| message: false
+  #| warning: false
+  #| code-fold: true
+  #| code-summary: "Code"
 
 
-spending_cty
-```
+  spending_cty <- spending |> 
+  group_by(cty_name, state_nm) |> 
+    summarize(
+       total_spent = sum(spending_total, na.rm = TRUE),
+       n = n()
+    ) |> 
+    arrange(desc(total_spent)) |>
+    mutate('total_spent_$' = scales::dollar(total_spent / 1e9, suffix = "B", accuracy = 0.01)) |>
+    select(cty_name, state_nm, 'total_spent_$')
 
-4.  In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.
 
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
+  spending_cty
+  ```
+  :::
 
-states_spending_20 <- spending |> 
-  filter(fyear==2020) |> 
-group_by(state_nm) |> 
-  summarize(
-    n = n(),
-    total_spent = sum(spending_total, na.rm = TRUE)
-  ) |> 
-  arrange(desc(total_spent)) |>
-  mutate(state_nm = str_to_title(state_nm)) |>
-  rename(state = state_nm) 
+**In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.**
 
-states_spending_24 <- spending |> 
-  filter(fyear==2024) |>
-group_by(state_nm) |> 
-  summarize(
-    n = n(),
-    total_spent = sum(spending_total, na.rm = TRUE)
-  ) |> 
-  arrange(desc(total_spent)) |>
-  mutate(state_nm = str_to_title(state_nm)) |>
-  rename(state = state_nm) 
+- ::: {}
+  ```{r}
+  #| message: false
+  #| warning: false
+  #| code-fold: true
+  #| code-summary: "Code"
 
-states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2020) |>
-  summarize(
-    total_spending = sum(total_spent)
-  ) |>
-  mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2020, 'total_spent_$')
+  voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
 
-states_spending_by_party_24 <- left_join(states_spending_24, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2024) |>
-  summarize(
-    total_spending = sum(total_spent)
-  ) |>
-  mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2024, 'total_spent_$')
+  states_spending_20 <- spending |> 
+    filter(fyear==2020) |> 
+  group_by(state_nm) |> 
+    summarize(
+      n = n(),
+      total_spent = sum(spending_total, na.rm = TRUE)
+    ) |> 
+    arrange(desc(total_spent)) |>
+    mutate(state_nm = str_to_title(state_nm)) |>
+    rename(state = state_nm) 
 
-states_spending_by_party_20
+  states_spending_24 <- spending |> 
+    filter(fyear==2024) |>
+  group_by(state_nm) |> 
+    summarize(
+      n = n(),
+      total_spent = sum(spending_total, na.rm = TRUE)
+    ) |> 
+    arrange(desc(total_spent)) |>
+    mutate(state_nm = str_to_title(state_nm)) |>
+    rename(state = state_nm) 
 
-states_spending_by_party_24
-```
+  states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2020) |>
+    summarize(
+      total_spending = sum(total_spent)
+    ) |>
+    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2020, 'total_spent_$')
+
+  states_spending_by_party_24 <- left_join(states_spending_24, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2024) |>
+    summarize(
+      total_spending = sum(total_spent)
+    ) |>
+    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2024, 'total_spent_$')
+
+  states_spending_by_party_20
+
+  states_spending_by_party_24
+  ```
+  :::
 
 ## Questions
 
@@ -159,7 +201,9 @@ states_spending_by_party_24
 
 Grants, contracts or spending may be officially spent in one area, but perhaps could be applied across the state. There could also be statewide grants. I need to evaluate this, as it could impact any analysis of county totals. For now, statewide anaylsis remains the safest bet.
 
-## Example employer: Palantir
+## Example employers
+
+### Palantir
 
 My community is all the communities that States Newsroom serves, so it would be important to watch a national player. While there is a slew of major defense contractors receiving money from the government, perhaps none have raised more attention in recent years than Palantir. The company specializes in AI development and software engineering, and has drawn scrutiny for its creation of spyware and surveillance technology employed by the federal government. It has received many multi-billion contracts by the DOD/DOW.
 
@@ -168,6 +212,14 @@ My community is all the communities that States Newsroom serves, so it would be 
 ```
 
 This company is important to watch both for its controversial work, but also as a canary for the shifting federal defense contractor environment and increased presence of surveillance and technology companies in addition to more traditional weapons and vehicle manufacturers.
+
+### Lockheed Martin
+
+lorem ipsum dolor
+
+### Boeing
+
+lorem ipsum dolor
 
 ## Who is your target audience?
 
