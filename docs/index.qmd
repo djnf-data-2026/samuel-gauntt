@@ -28,7 +28,9 @@ With President Trump requesting \$1.5 trillion for the next federal military bud
 
 ## Key takeaways
 
-**Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024. But they switched positions.**
+### **Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024. But they switched positions.**
+
+[**2020**]{.underline}
 
 ```{r}
 #| message: false
@@ -61,7 +63,7 @@ top_spenders_20 <- spending |>
   ) |>
   select(state_nm, total_spending_20) |> rename(
      State = state_nm,
-     `Total Received` = total_spending_20
+     `Total defense spending in (billions)` = total_spending_20
    ) 
 
 top_spenders_24 <- spending |>
@@ -79,7 +81,7 @@ top_spenders_24 <- spending |>
     state_nm = replace_na(state_nm, "NO STATE LISTED")
   ) |>select(state_nm, total_spending_24) |> rename(
      State = state_nm,
-     `Total Received` = total_spending_24
+     `Total defense spending in (billions)` = total_spending_24
    ) 
 
 datatable(
@@ -90,7 +92,15 @@ datatable(
   ),
   caption = "Top 10 states by defense spending in FY2020"
 ) 
+```
 
+[**2024**]{.underline}
+
+```{r}
+#| message: false
+#| warning: false
+#| code-fold: true
+#| code-summary: "Code"
 
 datatable(
   top_spenders_24,
@@ -104,13 +114,11 @@ datatable(
 
 ```
 
+<br>
 
-**LETS MAKE THE OUTPUT OF top_spenders_20 and \_24 in a datatable for a better presentation and**
+### **In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident. Virginia received the most spending per resident in 2024, at about \$5,800 per capita.** 
 
-2.  Virginia received the most spending per resident in 2024, at about \$5,800 per capita. In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident.
-
-
-**GREAT JOB with these maps and the 2020-2024 buttons. Format the numbers to round to the whole number (no decimals) and label the number Total defense spending in (billlions):**
+<br>
 
 <iframe title="Connecticut received $6325 in federal defense spending per resident in 2020, most of any state" aria-label="Choropleth map" id="datawrapper-chart-0Sn0K" src="https://datawrapper.dwcdn.net/0Sn0K/10/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height data-external="1">
 
@@ -120,15 +128,15 @@ datatable(
 <script type="text/javascript">(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();</script>
 ```
 
-**Over the four years the data tracks from 2020 to 2024, Fort Worth, Texas, received by far the most defense spending of any community in the country at about \$120 billion.**
+<br>
 
-**again, format this output in a datatable. same comment thoughout. the tibble outputs are really ugly and we can do better**
+### **Over the four years the data tracks (from FY2020 to FY2024), Tarrant County in the area of Fort Worth, Texas, received by far the most defense spending of any community across the country at about \$120 billion.**
 
 ```{r}
-  #| message: false
-  #| warning: false
-  #| code-fold: true
-  #| code-summary: "Code"
+#| message: false
+#| warning: false
+#| code-fold: true
+#| code-summary: Code
 
 
   spending_cty <- spending |> 
@@ -139,20 +147,42 @@ datatable(
     ) |> 
     arrange(desc(total_spent)) |>
     mutate('total_spent_$' = scales::dollar(total_spent / 1e9, suffix = "B", accuracy = 0.01)) |>
-    select(cty_name, state_nm, 'total_spent_$')
+    select(cty_name, state_nm, 'total_spent_$') |>  mutate(
+    cty_name = replace_na(cty_name, "NO COUNTY LISTED")
+  ) |> rename(
+     County = cty_name,
+     State = state_nm,
+     `Total defense spending in (billions)` = 'total_spent_$'
+   ) 
 
 
-  spending_cty
+datatable(
+  spending_cty,
+  options = list(
+    pageLength = 10,
+    dom = "t"
+  ),
+  caption = "Top 10 counties by defense spending from FY2020 to FY2024"
+) 
 ```
 
+### In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.
 
-**In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.**
+<br>
+
+<iframe title="States that voted for the opposite party of the president received more funding in both 2020 and 2024" aria-label="Grouped Bars" id="datawrapper-chart-IMyF8" src="https://datawrapper.dwcdn.net/IMyF8/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="320" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();</script>
+```
 
 ```{r}
-  #| message: false
-  #| warning: false
-  #| code-fold: true
-  #| code-summary: "Code"
+#| message: false
+#| warning: false
+#| code-fold: true
+#| code-summary: "Code"
 
   voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
 
@@ -178,21 +208,23 @@ datatable(
     mutate(state_nm = str_to_title(state_nm)) |>
     rename(state = state_nm) 
 
-  states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2020) |>
+states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2020) |>
     summarize(
       total_spending = sum(total_spent)
     ) |>
-    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2020, 'total_spent_$')
+    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2020, 'total_spent_$') |> write_csv("../data/party_spending_20.csv") 
+
+
 
   states_spending_by_party_24 <- left_join(states_spending_24, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) |> group_by(results_2024) |>
     summarize(
       total_spending = sum(total_spent)
     ) |>
-    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2024, 'total_spent_$')
+    mutate('total_spent_$' = scales::dollar(total_spending / 1e9, suffix = "B", accuracy = 0.01)) |> select(results_2024, 'total_spent_$') |> write_csv("../data/party_spending_24.csv") 
 
-  states_spending_by_party_20
 
-  states_spending_by_party_24
+
+
 ```
 
 ## Questions
@@ -212,23 +244,19 @@ Grants, contracts or spending may be officially spent in one area, but perhaps c
 
 My community is all the communities that States Newsroom serves, so it would be important to watch a national player. While there is a slew of major defense contractors receiving money from the government, perhaps none have raised more attention in recent years than Palantir. The company specializes in AI development and software engineering, and has drawn scrutiny for its creation of spyware and surveillance technology employed by the federal government. It has received many multi-billion contracts by the DOD/DOW.
 
-
-**fix this url - it doesnt render properly**
-
-(https://www.war.gov/News/Contracts/Contract/Article/4262594/contracts-for-aug-1-2025/){target="_blank"}
-
+[Department of Defense contract announcement](https://www.war.gov/News/Contracts/Contract/Article/4262594/contracts-for-aug-1-2025/){target="_blank"}
 
 This company is important to watch both for its controversial work, but also as a canary for the shifting federal defense contractor environment and increased presence of surveillance and technology companies in addition to more traditional weapons and vehicle manufacturers.
 
 ### Lockheed Martin
 
-lorem ipsum dolor
+A more traditional example of the kind of company receiving this spending is Lockheed Martin, the international defense contractor that manufactures fighter jets, missile and weapons systems, and spacecraft. The company generates about \$75B in annual revenue, primarily through large government contracts. It has a close relationship with the U.S. government, employing about 110,000 workers across more than 150 facilities in dozens of states. This gives the company significant influence and lobbying power over Congress and the federal government,
 
 ### Boeing
 
-lorem ipsum dolor
+Boeing similarly conducts significant business with the federal government and U.S. military. In addition to its significant commercial business producing airliners and other passenger jets, it produces fighter jets, drones, missiles, tankers and various other military-focused platforms. It reached almost \$90B in revenue last year, with about a third from government contracts.
 
-## Who is your target audience?
+## Target audience
 
 This story would ideally be interesting for a wide audience. Given that most states have a certain level of military presence and receive defense spending, seeing where spending is concentrated should be of interest for people across the country. I think people in states receiving less defense spending might actually be more interested, as they’re receiving less of a benefit even though its supported by their tax dollars. \
 
@@ -240,7 +268,7 @@ This story would ideally be interesting for a wide audience. Given that most sta
 
 - Kristy E. Williams, Director of Defense Capabilities and Management for the U.S. Government Accountability Office. She recently oversaw a report into the Pentagon that determined the its leadership did not consider the impact of recent civilian federal worker layoffs on its operations. 
 
-## Impact
+## Story impact
 
 Trump’s request of \$1.5 trillion in funding for the military would be a massive surge over any previous budget. It also coincides with slashes in federal support for many other agencies and departments, rising costs, increasing inflation and layoffs of federal workers. The money for this budget increase would have to come from other sources, such as cuts for other services. And this could impact daily lives of U.S. citizens.
 
@@ -262,368 +290,6 @@ Before I can finish my analysis, I still need to gain whatever data I can on the
 
 ## Estimated delivery
 
-I will have the bulk of my data analysis, research and visualization done this week. After that I need interviews to back up my research. I could turn this in by June 15, so I have time to track down lawmakers and advocates, as this is a busy time in Washington. 
+I will have the bulk of my data analysis, research and visualization done this week. After that I need interviews to back up my research. I could turn this in by June 19, so I have time to track down lawmakers and advocates, as this is a busy time in Washington. 
 
 ------------------------------------------------------------------------
-
-## **WORKING CODE**
-
-load libraries
-
-```{r}
-library(tidyverse)
-library(tidycensus)
-library(janitor)
-
-```
-
-Load DOD spending data
-
-```{r}
-
-spending <- read_csv("../data/dod_spending_fy2020-24.csv") |> 
-     clean_names()
-
-glimpse(spending) 
-
-```
-
-Spending by fiscal year
-
-```{r}
-options(scipen = 999)  # Disable scientific notation globally
-
-spending |> 
-group_by(fyear) |> 
-  summarize(
-    n = n(),
-    total_spent = sum(spending_total, na.rm = TRUE)
-  ) |> 
-  arrange(fyear)
-
-```
-
-Spending by state
-
-```{r}
-spending |> 
-group_by(state_nm) |> 
-  summarize(
-    n = n(),
-    total_spent = sum(spending_total, na.rm = TRUE)
-  ) |> 
-  arrange(desc(total_spent))
-
-```
-
-## Spending by county
-
-```{r}
-spending_cty <- spending |> 
-group_by(cty_name, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(total_spent))
-
-
-spending_cty
-```
-
-## Highlight specific county
-
-```{r}
-
-spending |> 
-  filter(cty_name == "HENNEPIN") |> 
-  group_by(agency) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(total_spent))
-```
-
-## Highlight specific state and city
-
-```{r}
-spending |> 
-  filter(state_nm == "ALABAMA") |> 
-  filter(cty_name == "COFFEE") |> 
-  select(fyear, cty_name, spending_total)
-```
-
-***My tests***
-
-```{r}
-#lets find outliers among counties in terms of funding
-
-county_spending <- spending |> 
-group_by(cty_name, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(total_spent)) 
-
-
-county_spending <- county_spending |>
-  mutate(
-    z_score = (total_spent - mean(total_spent)) /
-      sd(total_spent)
-  ) |>
-  filter(z_score > 3) |>
-  arrange(desc(z_score)) 
-
-county_spending
-
-```
-
-```{r}
-
-#looking at top three states over time
-
-spending |> 
-  filter(state_nm == "TEXAS") |> 
-  group_by(fyear, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(fyear))
-
-spending |> 
-  filter(state_nm == "VIRGINIA") |> 
-  group_by(fyear, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(fyear))
-
-spending |> 
-  filter(state_nm == "CALIFORNIA") |> 
-  group_by(fyear, state_nm) |> 
-  summarize(
-     total_spent = sum(spending_total, na.rm = TRUE),
-     n = n()
-  ) |> 
-  arrange(desc(fyear))
-
-```
-
-```{r}
-#lets compare funding to red states vs blue states to see if there is a difference. first, i'm going to create a dataframe of total spending in each state. 
-
-states_spending <- spending |> 
-group_by(state_nm) |> 
-  summarize(
-    n = n(),
-    total_spent = sum(spending_total, na.rm = TRUE)
-  ) |> 
-  arrange(desc(total_spent)) |>
-  mutate(state_nm = str_to_title(state_nm)) |>
-  rename(state = state_nm) 
-
-#lets load election results for the 2020 and 2024 elections. 
-
-voter_trends <- read_csv("../data/voter_trends.csv") |> clean_names() 
-
-states_spending_by_party <- left_join(states_spending, voter_trends, by = "state") |> filter(!is.na(electoral_votes)) 
-
-states_spending_by_party |> group_by(results_2024) |>
-  summarize(
-    total_spending = sum(total_spent)
-  ) 
-
-
-#time to bring in some population data as well. yay, per capita rates! 
-
-library(tidycensus) 
-
-
-spending <- spending |>
-  mutate(
-    GEOID = str_pad(as.character(cty_cd), 5, pad = "0")
-  ) 
-
-head(spending %>% select(state_cd, cty_cd)) 
-
-
-spending_20 <- spending |>
-  filter(fyear==2020) 
-
-spending_21 <- spending |>
-  filter(fyear==2021) 
-
-spending_22 <- spending |>
-  filter(fyear==2022) 
-
-spending_23 <- spending |>
-  filter(fyear==2023) 
-
-spending_24 <- spending |>
-  filter(fyear==2024) 
-
-county_pop_2020 <- get_acs(
-  geography = "county",
-  variables = "B01003_001",  # total population
-  year = 2020
-) |>
-  select(GEOID, population = estimate)  
-
-county_pop_2021 <- get_acs(
-  geography = "county",
-  variables = "B01003_001",  # total population
-  year = 2021
-) |>
-  select(GEOID, population = estimate) 
-
-county_pop_2022 <- get_acs(
-  geography = "county",
-  variables = "B01003_001",  # total population
-  year = 2022
-) |>
-  select(GEOID, population = estimate) 
-
-county_pop_2023 <- get_acs(
-  geography = "county",
-  variables = "B01003_001",  # total population
-  year = 2023
-) |>
-  select(GEOID, population = estimate) 
-
-county_pop_2024 <- get_acs(
-  geography = "county",
-  variables = "B01003_001",  # total population
-  year = 2024
-) |>
-  select(GEOID, population = estimate) 
-
-spending_20 <- spending_20 |>
-  left_join(county_pop_2020, by = "GEOID") 
-
-spending_21 <- spending_21 |>
-  left_join(county_pop_2021, by = "GEOID") 
-
-spending_22 <- spending_22 |>
-  left_join(county_pop_2022, by = "GEOID") 
-
-spending_23 <- spending_23 |>
-  left_join(county_pop_2023, by = "GEOID") 
-
-spending_24 <- spending_24 |>
-  left_join(county_pop_2024, by = "GEOID") 
-
-bind_rows()
-
-spending_pop <- bind_rows(
-  spending_20,
-  spending_21,
-  spending_22,
-  spending_23,
-  spending_24
-) 
-
-
-
-```
-
-```{r}
-#lets look at state spending again, now with population. 
-
-state_spending <- spending |>
-  group_by(fyear, state_nm) |>
-  summarize(
-    total_spent = sum(spending_total, na.rm = TRUE),
-    .groups = "drop"
-  ) 
-
-#get census info
-
-years <- 2020:2024
-
-state_pop <- map_dfr(years, function(y) {
-  get_acs(
-    geography = "state",
-    variables = "B01003_001",
-    year = y
-  ) %>%
-    transmute(
-      fyear = y,
-      state = NAME,
-      population = estimate
-    )
-})
-
-#lets group by state, and find the total spending per resident. 
-
-state_spending <- state_spending |>
-  mutate(
-    state = str_to_title(state_nm)
-  ) 
-
-state_spending_capita <- state_spending |>
-  left_join(
-    state_pop,
-    by = c("state", "fyear")
-  )
-
-state_spending_capita <- state_spending_capita |>
-  mutate(
-    spending_per_capita = total_spent / population
-  ) 
-
-state_spending_capita |>
-  filter(fyear == 2024) |>
-  arrange(desc(spending_per_capita)) |>
-  select(state, total_spent, population, spending_per_capita)
-
-state_spending_capita |>
-  left_join(voter_trends, by = "state") |>
-  group_by(results_2024) |>
-  summarize(
-    total_spending = sum(total_spent),
-    total_population = sum(population),
-    spending_per_capita = total_spending/total_population,
-    .groups = "drop"
-  ) 
-
-state_spending_capita |> write_csv("../data/state_spending_per_capita.csv")
-
-```
-
-```{r}
-top_spenders_20 <- spending |>
-  filter(fyear == 2020) |>
-  group_by(state_nm) |>
-  summarize(
-    total_spent = sum(spending_total, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  arrange(desc(total_spent)) |>
-  mutate(
-    total_spent_billions = total_spent / 1e9,
-    total_spending_20 = scales::dollar(total_spent_billions, suffix = "B")
-  ) |> select(state_nm, total_spending_20)
-
-
-top_spenders_24 <- spending |>
-  filter(fyear == 2024) |>
-  group_by(state_nm) |>
-  summarize(
-    total_spent = sum(spending_total, na.rm = TRUE),
-    .groups = "drop"
-  ) |>
-  arrange(desc(total_spent)) |>
-  mutate(
-    total_spent_billions = total_spent / 1e9,
-    total_spending_24 = scales::dollar(total_spent_billions, suffix = "B")
-  ) |> select(state_nm, total_spending_24)
-
-top_spenders_20
-
-top_spenders_24
-
-```
