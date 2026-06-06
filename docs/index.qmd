@@ -104,7 +104,13 @@ datatable(
 
 ```
 
-**Virginia received the most spending per resident in 2024, at about \$5,800 per capita. In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident.**
+
+**LETS MAKE THE OUTPUT OF top_spenders_20 and \_24 in a datatable for a better presentation and**
+
+2.  Virginia received the most spending per resident in 2024, at about \$5,800 per capita. In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident.
+
+
+**GREAT JOB with these maps and the 2020-2024 buttons. Format the numbers to round to the whole number (no decimals) and label the number Total defense spending in (billlions):**
 
 <iframe title="Connecticut received $6325 in federal defense spending per resident in 2020, most of any state" aria-label="Choropleth map" id="datawrapper-chart-0Sn0K" src="https://datawrapper.dwcdn.net/0Sn0K/10/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height data-external="1">
 
@@ -115,6 +121,8 @@ datatable(
 ```
 
 **Over the four years the data tracks from 2020 to 2024, Fort Worth, Texas, received by far the most defense spending of any community in the country at about \$120 billion.**
+
+**again, format this output in a datatable. same comment thoughout. the tibble outputs are really ugly and we can do better**
 
 ```{r}
   #| message: false
@@ -137,12 +145,10 @@ datatable(
   spending_cty
 ```
 
-:::
 
 **In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.**
 
-- ::: {}
-  ```{r}
+```{r}
   #| message: false
   #| warning: false
   #| code-fold: true
@@ -187,8 +193,7 @@ datatable(
   states_spending_by_party_20
 
   states_spending_by_party_24
-  ```
-  :::
+```
 
 ## Questions
 
@@ -207,7 +212,11 @@ Grants, contracts or spending may be officially spent in one area, but perhaps c
 
 My community is all the communities that States Newsroom serves, so it would be important to watch a national player. While there is a slew of major defense contractors receiving money from the government, perhaps none have raised more attention in recent years than Palantir. The company specializes in AI development and software engineering, and has drawn scrutiny for its creation of spyware and surveillance technology employed by the federal government. It has received many multi-billion contracts by the DOD/DOW.
 
-(https://www.war.gov/News/Contracts/Contract/Article/4262594/contracts-for-aug-1-2025/){target="\_blank"}
+
+**fix this url - it doesnt render properly**
+
+(https://www.war.gov/News/Contracts/Contract/Article/4262594/contracts-for-aug-1-2025/){target="_blank"}
+
 
 This company is important to watch both for its controversial work, but also as a canary for the shifting federal defense contractor environment and increased presence of surveillance and technology companies in addition to more traditional weapons and vehicle manufacturers.
 
