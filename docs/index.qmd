@@ -28,7 +28,7 @@ With President Trump requesting \$1.5 trillion for the next federal military bud
 
 ## Key takeaways
 
-### **Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024. But they switched positions.**
+### **Finding 1: Texas, California and Virginia made up the Top 3 states in total spending in both 2020 and 2024. But they switched positions.**
 
 [**2020**]{.underline}
 
@@ -116,7 +116,7 @@ datatable(
 
 <br>
 
-### **In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident. Virginia received the most spending per resident in 2024, at about \$5,800 per capita.** 
+### **Finding 2: In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident. Virginia received the most spending per resident in 2024, at about \$5,800 per capita.** 
 
 <br>
 
@@ -130,7 +130,7 @@ datatable(
 
 <br>
 
-### **Over the four years the data tracks (from FY2020 to FY2024), Tarrant County in the area of Fort Worth, Texas, received by far the most defense spending of any community across the country at about \$120 billion.**
+### **Finding 3: Over the four years the data tracks (from FY2020 to FY2024), Tarrant County in the area of Fort Worth, Texas, received by far the most defense spending of any community across the country at about \$120 billion.**
 
 ```{r}
 #| message: false
@@ -166,7 +166,7 @@ datatable(
 ) 
 ```
 
-### In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.
+### **Finding 4: In 2020, during Donald Trump's presidency, states that voted for the Democratic Party in the Electoral College received more total defense spending. In 2024, during Joe Biden's presidency, states voting for the Republican Party in the Electoral College received slightly more spending on average.**
 
 <br>
 
