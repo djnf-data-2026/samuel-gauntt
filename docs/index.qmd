@@ -2,6 +2,7 @@
 title: "The U.S. government spends hundreds of billions each year on defense. Where does it go?"
 format: 
   html: 
+    theme: lumen
     toc: true
     toc-depth: 2
     math: katex
@@ -116,7 +117,7 @@ datatable(
 
 <br>
 
-### **Finding 2: In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident. Virginia received the most spending per resident in 2024, at about \$5,800 per capita.** 
+### **Finding 2: In 2020, Connecticut ranked first in per capita spending, with an average of \$6300 for each resident. Virginia received the most spending per resident in 2024, at about \$5,800 per capita.**
 
 <br>
 
@@ -226,6 +227,17 @@ states_spending_by_party_20 <- left_join(states_spending_20, voter_trends, by = 
 
 
 ```
+
+### Earmarks
+
+<iframe title="Florida received $2.4 billion in defense spending through earmarks from FY2024-26" aria-label="Choropleth map" id="datawrapper-chart-s2cTF" src="https://datawrapper.dwcdn.net/s2cTF/2/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="527" data-external="1">
+
+</iframe>
+
+```{=html}
+<script type="text/javascript">(function(){function e(){window.addEventListener(`message`,function(e){if(e.data[`datawrapper-height`]!==void 0){var t=document.querySelectorAll(`iframe`);for(var n in e.data[`datawrapper-height`])for(var r=0,i;i=t[r];r++)if(i.contentWindow===e.source){var a=e.data[`datawrapper-height`][n]+`px`;i.style.height=a}}})}e()})();</script>
+```
+
 
 ## Questions
 
